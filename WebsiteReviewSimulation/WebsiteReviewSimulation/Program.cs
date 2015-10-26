@@ -53,7 +53,6 @@ namespace WebsiteReviewSimulation
                     }
                     case 2:
                     {
-                        // Run Renos Code
                         break;
                     }
                     case 3:
@@ -181,6 +180,37 @@ namespace WebsiteReviewSimulation
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
+        public static int CountLCSDynamic(char[] str1, char[] str2)
+        {
+            int[,] arr = new int[str1.Length + 1, str2.Length + 1];
+
+            for (int i = 0; i <= str2.Length; i++)
+            {
+                arr[0, i] = 0;
+            }
+            for (int i = 0; i <= str1.Length; i++)
+            {
+                arr[i, 0] = 0;
+            }
+
+            for (int i = 1; i <= str1.Length; i++)
+            {
+                for (int j = 1; j <= str2.Length; j++)
+                {
+                    if (str1[i - 1] == str2[j - 1])
+                    {
+                        arr[i, j] = arr[i - 1, j - 1] + 1;
+                    }
+                    else
+                    {
+                        arr[i, j] = Max(arr[i - 1, j], arr[i, j - 1]);
+                    }
+                }
+            }
+
+            return arr[str1.Length, str2.Length];
+        }
+
         public static int CountLCSGreedy(string X, string Y)
         {
 
@@ -288,9 +318,19 @@ namespace WebsiteReviewSimulation
             // TODO: Remove For Final Version
             Console.WriteLine(LSym);
             return LSym.Length / 2;
-
         }
-        
+
+        /** Dynamic Programming Helper Methods **/
+        private static int Max(int int1, int int2)
+        {
+            return int1 > int2 ? int1 : int2;
+        }
+
+        private static int Min(int int1, int int2)
+        {
+            return int1 < int2 ? int1 : int2;
+        }  
+
         /** Greedy LCS Helper Methods **/
         private static string Match(string X, string Y)
         {
