@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebsiteReviewSimulation
@@ -47,6 +49,15 @@ namespace WebsiteReviewSimulation
                         ProcessRealReviewData();
                         GenerateSameLengthReviews();
                         GenerateDifferentLengthReviews();
+                        break;
+                    }
+                    case 2:
+                    {
+                        // Run Renos Code
+                        break;
+                    }
+                    case 3:
+                    {
                         break;
                     }
                 }
@@ -168,6 +179,165 @@ namespace WebsiteReviewSimulation
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";      
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static int CountLCSGreedy(string X, string Y)
+        {
+
+            X = Match(X, Y);
+
+            int[] Processed_Y = new int[Y.Length];
+            int y_length = Y.Length;
+
+            for (int j = 0; j < y_length; j++)
+                Processed_Y[j] = 0;
+
+            int m = X.Length;
+            int n = Y.Length;
+
+            string L = string.Empty;
+            string LSym = string.Empty;
+
+            int R = 0;
+            int i = 1;
+
+            int[] P = new int[100];
+
+            P[i] = Position(X, Y, i, Processed_Y, R);
+            i = 1;
+
+            while (i <= m)
+            {
+                if (i != m)
+                    P[i + 1] = Position(X, Y, (i + 1), Processed_Y, R);
+
+                if (P[i + 1] == 0)
+                {
+                    if (P[i] > R)
+                    {
+                        L = L + " " + P[i].ToString();
+                        LSym = LSym + " " + X.ElementAt(i - 1);
+                    }
+
+                    break;
+                }
+
+                if (P[i + 1] < R || P[i] < R)
+                    R = 0;
+
+                if (P[i] > P[i + 1])
+                {
+                    if (R == 0 && i > 1)
+                    {
+                        L = L + " " + P[i].ToString();
+                        LSym = LSym + " " + X.ElementAt(i - 1);
+                        Processed_Y[P[i] - 1] = 1;
+                        R = P[i];
+                        i = i + 1;
+
+                        if (R == Y.Length || i > X.Length)
+                            break;
+
+                        P[i] = Position(X, Y, i, Processed_Y, R);
+                    }
+                    else
+                    {
+                        L = L + " " + P[i + 1].ToString();
+                        LSym = LSym + " " + X.ElementAt(i + 1 - 1);
+                        Processed_Y[P[i + 1] - 1] = 1;
+                        R = P[i + 1];
+                        i = (i + 1) + 1;
+
+                        if (R == Y.Length || i > X.Length)
+                            break;
+
+                        P[i] = Position(X, Y, i, Processed_Y, R);
+                    }
+                }
+                else
+                {
+                    if (R == 0 && i > 1)
+                    {
+                        L = L + " " + P[i + 1].ToString();
+                        LSym = LSym + " " + X.ElementAt(i + 1 - 1);
+                        Processed_Y[P[i + 1] - 1] = 1;
+                        R = P[i + 1];
+                        i = (i + 1) + 1;
+
+                        if (R == Y.Length || i > X.Length)
+                            break;
+
+                        P[i] = Position(X, Y, i, Processed_Y, R);
+                    }
+                    else
+                    {
+                        L = L + " " + P[i].ToString();
+                        LSym = LSym + " " + X.ElementAt(i - 1);
+                        Processed_Y[P[i] - 1] = 1;
+                        R = P[i];
+                        i = i + 1;
+
+                        if (R == Y.Length || i > X.Length)
+                            break;
+
+                        P[i] = Position(X, Y, i, Processed_Y, R);
+                    }
+                }
+            }
+
+            // TODO: Remove For Final Version
+            Console.WriteLine(LSym);
+            return LSym.Length / 2;
+
+        }
+        
+        /** Greedy LCS Helper Methods **/
+        private static string Match(string X, string Y)
+        {
+            var result = string.Empty;
+
+            for (var i = 0; i < X.Length; i++)
+            {
+                for (int j = 0; j < Y.Length; j++)
+                {
+                    if (X.ElementAt(i) == Y.ElementAt(j))
+                    {
+                        result = result + X.ElementAt(i);
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static int Position(string X, string Y, int i, int[] Processed_Y, int R)
+        {
+            int n = Y.Length;
+            int k = 0;
+            int kr = 0;
+
+            i = i - 1;
+
+            for (k = 0; k < n; k++)
+            {
+                if ((X.ElementAt(i)) == Y.ElementAt(k) && Processed_Y[k] == 0)
+                {
+                    kr = k + 1;
+                    break;
+                }
+            }
+
+            for (k = R; k < n; k++)
+            {
+                if ((X.ElementAt(i) == Y.ElementAt(k)) && Processed_Y[k] == 0)
+                {
+                    kr = k + 1;
+                    break;
+                }
+            }
+
+            return kr;
         }
     }
 
