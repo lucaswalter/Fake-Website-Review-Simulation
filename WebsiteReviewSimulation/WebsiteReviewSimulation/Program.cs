@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace WebsiteReviewSimulation
 {
@@ -44,18 +40,18 @@ namespace WebsiteReviewSimulation
 
                 switch (userInput)
                 {
-                    case 1:
+                    case 1: // Generate Datasets
                     {
                         ProcessRealReviewData();
                         GenerateSameLengthReviews();
                         GenerateDifferentLengthReviews();
                         break;
                     }
-                    case 2:
+                    case 2: // Run Dynamice Programming Simulation
                     {
                         break;
                     }
-                    case 3:
+                    case 3: // Runn Greedy Simulation
                     {
                         break;
                     }
@@ -158,6 +154,12 @@ namespace WebsiteReviewSimulation
                 System.IO.File.WriteAllLines(dataPath, reviews);
             }
         }
+
+        /** Module 3A: Run Dynamic Programming Simulation **/
+
+
+        /** Module 3B: Run Greedy Simulation **/
+
 
         /** Helper Methods **/
         static public int DisplayMenu()
