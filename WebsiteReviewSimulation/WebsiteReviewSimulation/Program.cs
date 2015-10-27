@@ -373,6 +373,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -410,6 +412,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -446,6 +450,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
 
@@ -483,6 +489,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
 
@@ -520,6 +528,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -556,6 +566,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -592,6 +604,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -628,6 +642,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -664,6 +680,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 timer.Stop();
@@ -900,6 +918,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -937,6 +957,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -973,6 +995,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
 
@@ -1010,6 +1034,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
 
@@ -1047,6 +1073,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -1083,6 +1111,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -1119,6 +1149,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -1155,6 +1187,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -1191,6 +1225,8 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+                scoreTotal = 0;
+                avgCounter = 0;
                 subCounter++;
 
                 timer.Stop();
