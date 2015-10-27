@@ -199,6 +199,7 @@ namespace WebsiteReviewSimulation
                 var results = new List<Result>();
                 var rawReviews = File.ReadAllLines(file);
                 double scoreTotal = 0;
+                double timeTotal = 0;
                 double avgCounter = 0;
 
                 foreach (var review in rawReviews)
@@ -208,8 +209,7 @@ namespace WebsiteReviewSimulation
                 Console.WriteLine("\nComputing Results For Random Dataset Of Length: {0} ", STRING_LENGTH[counter]);
                 Console.ForegroundColor = ConsoleColor.White;
 
-                var timer = new Stopwatch();
-                timer.Start();
+                var timer = new Stopwatch();              
 
                 foreach (var X in reviews)
                 {
@@ -218,24 +218,27 @@ namespace WebsiteReviewSimulation
                         if (X == Y)
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(X.ToCharArray(), Y.ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Y.Length;
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && X != Y)
                             results.Add(new Result { Left = X, Right = Y, Score = similarityScore });        
                     }              
-                }
-
-                timer.Stop();
+                }          
 
                 OutputResults(results, "DynamicRandomSameLength", counter);
 
                 Console.WriteLine("\nBucket-Set {0} Results:", counter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average LCS Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
-                
+
                 timer.Reset();
                 results.Clear();
                 counter++;
@@ -257,8 +260,9 @@ namespace WebsiteReviewSimulation
                 var results = new List<Result>();
                 var rawReviews = File.ReadAllLines(file);
                 double scoreTotal = 0;
+                double timeTotal = 0;
                 double avgCounter = 0;
-
+                
                 foreach (var review in rawReviews)
                     reviews.Add(review.Trim());
 
@@ -267,7 +271,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.White;
 
                 var timer = new Stopwatch();
-                timer.Start();
 
                 foreach (var X in reviews)
                 {                  
@@ -276,10 +279,15 @@ namespace WebsiteReviewSimulation
                         if (X == Y)
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(X.ToCharArray(), Y.ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(X.Length, Y.Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && X != Y)
                             results.Add(new Result { Left = X, Right = Y, Score = similarityScore });
@@ -291,7 +299,7 @@ namespace WebsiteReviewSimulation
                 OutputResults(results, "DynamicRandomDifferentLengths",  counter);
 
                 Console.WriteLine("\nBucket-Set {0} Results:", counter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Execution Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
@@ -322,6 +330,7 @@ namespace WebsiteReviewSimulation
 
                 var subCounter = 1;
 
+                double timeTotal = 0;
                 double scoreTotal = 0;
                 double avgCounter = 0;
 
@@ -339,8 +348,7 @@ namespace WebsiteReviewSimulation
 
                 // Start Timer Diagnostics
                 var timer = new Stopwatch();
-                timer.Start();
-
+                
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
@@ -353,10 +361,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });                    
@@ -369,10 +382,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -380,9 +395,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
-
 
                 // 101 - 200
                 for (int i = 101; i < 200; i++)
@@ -392,10 +404,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -408,10 +425,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -419,8 +438,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 201 - 300
                 for (int i = 201; i < 300; i++)
@@ -430,10 +447,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -446,20 +468,19 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
 
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 301 - 400
                 for (int i = 301; i < 400; i++)
@@ -469,10 +490,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -485,20 +511,19 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
 
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 401 - 500
                 for (int i = 401; i < 500; i++)
@@ -508,10 +533,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -524,10 +554,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
-
+                
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -535,8 +567,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 501 - 600
                 for (int i = 501; i < 600; i++)
@@ -546,10 +576,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -562,10 +597,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -573,8 +610,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 601 - 700
                 for (int i = 601; i < 700; i++)
@@ -584,10 +619,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -600,10 +640,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -611,8 +653,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 701 - 800
                 for (int i = 701; i < 800; i++)
@@ -622,10 +662,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -638,10 +683,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -649,8 +696,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 801 - 900
                 for (int i = 801; i < 900; i++)
@@ -660,10 +705,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -676,21 +726,19 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
 
-                timer.Stop();
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 901 - 999
                 for (int i = 901; i < 999; i++)
@@ -700,10 +748,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -716,11 +769,10 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
-                subCounter++;
 
                 // Increment To Next Bucket
                 counter++;
@@ -744,6 +796,7 @@ namespace WebsiteReviewSimulation
                 var results = new List<Result>();
                 var rawReviews = File.ReadAllLines(file);
                 double scoreTotal = 0;
+                double timeTotal = 0;
                 double avgCounter = 0;
 
                 foreach (var review in rawReviews)
@@ -754,7 +807,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.White;
 
                 var timer = new Stopwatch();
-                timer.Start();
 
                 foreach (var X in reviews)
                 {
@@ -763,22 +815,25 @@ namespace WebsiteReviewSimulation
                         if (X == Y)
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(X, Y);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Y.Length;
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && X != Y)
                             results.Add(new Result { Left = X, Right = Y, Score = similarityScore });
                     }
                 }
 
-                timer.Stop();
-
                 OutputResults(results, "GreedyRandomSameLength", counter);
 
                 Console.WriteLine("\nBucket-Set {0} Results:", counter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average LCS Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
@@ -802,6 +857,7 @@ namespace WebsiteReviewSimulation
                 var results = new List<Result>();
                 var rawReviews = File.ReadAllLines(file);
                 double scoreTotal = 0;
+                double timeTotal = 0;
                 double avgCounter = 0;
 
                 foreach (var review in rawReviews)
@@ -812,7 +868,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.White;
 
                 var timer = new Stopwatch();
-                timer.Start();
 
                 foreach (var X in reviews)
                 {
@@ -821,10 +876,15 @@ namespace WebsiteReviewSimulation
                         if (X == Y)
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(X, Y);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(X.Length, Y.Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && X != Y)
                             results.Add(new Result { Left = X, Right = Y, Score = similarityScore });
@@ -836,7 +896,7 @@ namespace WebsiteReviewSimulation
                 OutputResults(results, "GreedyRandomDifferentLengths", counter);
 
                 Console.WriteLine("\nBucket-Set {0} Results:", counter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Execution Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
@@ -867,6 +927,7 @@ namespace WebsiteReviewSimulation
 
                 var subCounter = 1;
 
+                double timeTotal = 0;
                 double scoreTotal = 0;
                 double avgCounter = 0;
 
@@ -884,7 +945,6 @@ namespace WebsiteReviewSimulation
 
                 // Start Timer Diagnostics
                 var timer = new Stopwatch();
-                timer.Start();
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
@@ -898,10 +958,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -914,10 +979,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -925,9 +992,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
-
 
                 // 101 - 200
                 for (int i = 101; i < 200; i++)
@@ -937,10 +1001,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -953,10 +1022,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -964,8 +1035,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 201 - 300
                 for (int i = 201; i < 300; i++)
@@ -975,10 +1044,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -991,20 +1065,19 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
 
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 301 - 400
                 for (int i = 301; i < 400; i++)
@@ -1014,10 +1087,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -1030,20 +1108,19 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
 
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 401 - 500
                 for (int i = 401; i < 500; i++)
@@ -1053,10 +1130,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -1069,10 +1151,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -1080,8 +1164,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 501 - 600
                 for (int i = 501; i < 600; i++)
@@ -1091,10 +1173,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -1107,10 +1194,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -1118,8 +1207,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 601 - 700
                 for (int i = 601; i < 700; i++)
@@ -1129,10 +1216,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -1145,10 +1237,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -1156,8 +1250,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 701 - 800
                 for (int i = 701; i < 800; i++)
@@ -1167,10 +1259,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -1183,10 +1280,12 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
@@ -1194,8 +1293,6 @@ namespace WebsiteReviewSimulation
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 801 - 900
                 for (int i = 801; i < 900; i++)
@@ -1205,10 +1302,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -1221,21 +1323,19 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
+
+                timeTotal = 0;
                 scoreTotal = 0;
                 avgCounter = 0;
                 subCounter++;
 
-                timer.Stop();
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                timer.Start();
 
                 // 901 - 999
                 for (int i = 901; i < 999; i++)
@@ -1245,10 +1345,15 @@ namespace WebsiteReviewSimulation
                         if (reviews[i] == reviews[j])
                             continue;
 
+                        timer.Start();
                         var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        timer.Stop();
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        timeTotal += timer.ElapsedTicks;
                         scoreTotal += similarityScore;
                         avgCounter++;
+
+                        timer.Reset();
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
@@ -1261,11 +1366,10 @@ namespace WebsiteReviewSimulation
                 results.Clear();
 
                 Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
-                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("LCS Algorithm Comparison Time: {0} ticks", timeTotal / avgCounter);
                 Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
 
                 timer.Reset();
-                subCounter++;
 
                 // Increment To Next Bucket
                 counter++;
