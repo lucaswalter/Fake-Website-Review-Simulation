@@ -318,22 +318,34 @@ namespace WebsiteReviewSimulation
                 var data = rawFile.ReadToEnd();
                 rawFile.Close();
 
+                var subCounter = 1;
+
+                double scoreTotal = 0;
+                double avgCounter = 0;
+
                 string[] parsedReviews = data.Split('|');
                 for (int i = 0; i < parsedReviews.Length; i++)
                     parsedReviews[i] = parsedReviews[i].Trim('\r', '\n');
 
                 reviews = parsedReviews.ToList();
 
+                Console.ForegroundColor = ConsoleColor.Green;
                 System.Console.WriteLine("\nComputing Results For Real World Dataset Bucket: {0}", counter);
-             
-                // Hacky Sub-Bucket Solution
+                Console.ForegroundColor = ConsoleColor.White;
 
+                /********** Hacky Sub-Bucket Solution **********/
+
+                // Start Timer Diagnostics
+                var timer = new Stopwatch();
+                timer.Start();
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                // 0 - 100
                 for (int i = 0; i < 100; i++)
-                {
-                    // Start Timer Diagnostics
-                    var timer = new Stopwatch();
-                    timer.Start();
-
+                {            
                     for (int j = 0; j < 100; j++)
                     {
                         if (reviews[i] == reviews[j])
@@ -341,17 +353,356 @@ namespace WebsiteReviewSimulation
 
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
 
                         if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
-                            results.Add(new Result { Score = similarityScore, Time = 0 });                  
-                    }
-
-                    timer.Stop();
-                    OutputResults(results, "DynamicRealWorld", counter);
-                    timer.Reset();
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });                    
+                    }             
                 }
-          
-                System.Console.WriteLine("\nCalculations Complete For Real World Dataset Bucket: {0}", counter);
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+
+                // 101 - 200
+                for (int i = 101; i < 200; i++)
+                {
+                    for (int j = 101; j < 200; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 201 - 300
+                for (int i = 201; i < 300; i++)
+                {
+                    for (int j = 201; j < 300; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 301 - 400
+                for (int i = 301; i < 400; i++)
+                {
+                    for (int j = 301; j < 400; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 401 - 500
+                for (int i = 401; i < 500; i++)
+                {
+                    for (int j = 401; j < 500; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 501 - 600
+                for (int i = 501; i < 600; i++)
+                {
+                    for (int j = 501; j < 600; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 601 - 700
+                for (int i = 601; i < 700; i++)
+                {
+                    for (int j = 601; j < 700; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 701 - 800
+                for (int i = 701; i < 800; i++)
+                {
+                    for (int j = 701; j < 800; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 801 - 900
+                for (int i = 801; i < 900; i++)
+                {
+                    for (int j = 801; j < 900; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                timer.Stop();
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 901 - 999
+                for (int i = 901; i < 999; i++)
+                {
+                    for (int j = 901; j < 999; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "DynamicRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                // Increment To Next Bucket
                 counter++;
             }
 
@@ -395,7 +746,7 @@ namespace WebsiteReviewSimulation
                         var similarityScore = Convert.ToDouble(lcsLength) / Y.Length;
 
                         if (similarityScore > SCORE_THRESHOLD)
-                            results.Add(new Result { Score = similarityScore, Time = 0 });
+                            results.Add(new Result { Left = X, Right = Y, Score = similarityScore });
                     }
 
                     timer.Stop();
@@ -676,9 +1027,23 @@ namespace WebsiteReviewSimulation
             return LSym.Length / 2;
         }
 
-        public static void OutputResults(List<Result> results, string fileName, int counter)
+        public static void OutputResults(List<Result> results, string fileName, float counter)
         {
             var path = resultPath + fileName + "[" + counter + "]" + ".txt";
+            var newResults = new List<string>();
+
+            foreach (var result in results)
+            {
+                var newResult = "[" + result.Score + "] " + result.Left + " <---> " + result.Right;
+                newResults.Add(newResult);
+            }
+
+            File.WriteAllLines(path, newResults);
+        }
+
+        public static void OutputResults(List<Result> results, string fileName, float counter, float subCounter)
+        {
+            var path = resultPath + fileName + "[" + counter + "-" + subCounter + "]" + ".txt";
             var newResults = new List<string>();
 
             foreach (var result in results)
