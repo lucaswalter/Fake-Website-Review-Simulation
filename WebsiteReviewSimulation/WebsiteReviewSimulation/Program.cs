@@ -64,7 +64,7 @@ namespace WebsiteReviewSimulation
                     }
                     case 4:
                     {
-                        RunDynamicSimulation();
+                        RunDynamicSimulationRealWorldDataset();
                         break;
                     }
                     case 5:
@@ -74,12 +74,12 @@ namespace WebsiteReviewSimulation
                     }
                     case 6:
                     {
-
+                        RunGreedySimulationRandomSetDifferentLengths();
                         break;
                     }
                     case 7:
                     {
-
+                        RunGreedySimulationRealWorldDataset();
                         break;
                     }
                 }
@@ -189,9 +189,6 @@ namespace WebsiteReviewSimulation
         public static void RunDymanicSimulationRandomSetSameLength()
         {
             var appPathSame = Environment.CurrentDirectory + "/Random/Same/";
-            var appPathDifferent = Environment.CurrentDirectory + "/Random/Different/";
-            var appPathProcessed = Environment.CurrentDirectory + "/Processed/";
-
             var counter = 0;
 
             // Random Dataset-Same
@@ -249,10 +246,7 @@ namespace WebsiteReviewSimulation
 
         public static void RunDynamicSimulationRandomSetDifferentLengths()
         {
-            var appPathSame = Environment.CurrentDirectory + "/Random/Same/";
             var appPathDifferent = Environment.CurrentDirectory + "/Random/Different/";
-            var appPathProcessed = Environment.CurrentDirectory + "/Processed/";
-
             var counter = 0;
 
             // Random Dataset-Different
@@ -308,15 +302,8 @@ namespace WebsiteReviewSimulation
             Console.WriteLine("\n---------------------------- END OF RANDOM DATASET ----------------------------\n");
         }
 
-        public static void RunDynamicSimulation()
+        public static void RunDynamicSimulationRealWorldDataset()
         {
-            // 1: Random-Same Dataset
-            // 2: Random-Different Dataset
-            // 3: Output Results To File
-            // 4: Real World Dataset
-
-            var appPathSame = Environment.CurrentDirectory + "/Random/Same/";
-            var appPathDifferent = Environment.CurrentDirectory + "/Random/Different/";
             var appPathProcessed = Environment.CurrentDirectory + "/Processed/";
 
             var counter = 0;
@@ -782,25 +769,501 @@ namespace WebsiteReviewSimulation
             }
 
             Console.WriteLine("\n---------------------------- END OF RANDOM DATASET ----------------------------\n");
-        }    
+        }
+
+        public static void RunGreedySimulationRandomSetDifferentLengths()
+        {
+            var appPathDifferent = Environment.CurrentDirectory + "/Random/Different/";
+            var counter = 0;
+
+            // Random Dataset-Different
+            foreach (var file in Directory.EnumerateFiles(appPathDifferent, "*.txt"))
+            {
+                // List Of Reviews In File
+                var reviews = new List<string>();
+                var results = new List<Result>();
+                var rawReviews = File.ReadAllLines(file);
+                double scoreTotal = 0;
+                double avgCounter = 0;
+
+                foreach (var review in rawReviews)
+                    reviews.Add(review.Trim());
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                System.Console.WriteLine("\nComputing Results For Random Dataset In The Range: {0} - {1} ", RANGES[counter].Item1, RANGES[counter].Item2);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                var timer = new Stopwatch();
+                timer.Start();
+
+                foreach (var X in reviews)
+                {
+                    foreach (var Y in reviews)
+                    {
+                        if (X == Y)
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(X, Y);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(X.Length, Y.Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && X != Y)
+                            results.Add(new Result { Left = X, Right = Y, Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRandomDifferentLengths", counter);
+
+                Console.WriteLine("\nBucket-Set {0} Results:", counter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                results.Clear();
+                counter++;
+            }
+
+            Console.WriteLine("\n---------------------------- END OF RANDOM DATASET ----------------------------\n");
+        }
+
+        public static void RunGreedySimulationRealWorldDataset()
+        {
+            var appPathProcessed = Environment.CurrentDirectory + "/Processed/";
+
+            var counter = 0;
+
+            // Real World Dataset
+            foreach (var file in Directory.EnumerateFiles(appPathProcessed, "*.txt"))
+            {
+                // List Of Reviews In File
+                var reviews = new List<string>();
+                List<Result> results = new List<Result>();
+
+                // Pre-Process Data Split By Pipe
+                var rawFile = new StreamReader(file);
+                var data = rawFile.ReadToEnd();
+                rawFile.Close();
+
+                var subCounter = 1;
+
+                double scoreTotal = 0;
+                double avgCounter = 0;
+
+                string[] parsedReviews = data.Split('|');
+                for (int i = 0; i < parsedReviews.Length; i++)
+                    parsedReviews[i] = parsedReviews[i].Trim('\r', '\n');
+
+                reviews = parsedReviews.ToList();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Bucket: {0}", counter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                /********** Hacky Sub-Bucket Solution **********/
+
+                // Start Timer Diagnostics
+                var timer = new Stopwatch();
+                timer.Start();
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                // 0 - 100
+                for (int i = 0; i < 100; i++)
+                {
+                    for (int j = 0; j < 100; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+
+                // 101 - 200
+                for (int i = 101; i < 200; i++)
+                {
+                    for (int j = 101; j < 200; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 201 - 300
+                for (int i = 201; i < 300; i++)
+                {
+                    for (int j = 201; j < 300; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 301 - 400
+                for (int i = 301; i < 400; i++)
+                {
+                    for (int j = 301; j < 400; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 401 - 500
+                for (int i = 401; i < 500; i++)
+                {
+                    for (int j = 401; j < 500; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 501 - 600
+                for (int i = 501; i < 600; i++)
+                {
+                    for (int j = 501; j < 600; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 601 - 700
+                for (int i = 601; i < 700; i++)
+                {
+                    for (int j = 601; j < 700; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 701 - 800
+                for (int i = 701; i < 800; i++)
+                {
+                    for (int j = 701; j < 800; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 801 - 900
+                for (int i = 801; i < 900; i++)
+                {
+                    for (int j = 801; j < 900; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                timer.Stop();
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine("\nComputing Results For Real World Dataset Sub-Bucket: {0}-{1}", counter, subCounter);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                timer.Start();
+
+                // 901 - 999
+                for (int i = 901; i < 999; i++)
+                {
+                    for (int j = 901; j < 999; j++)
+                    {
+                        if (reviews[i] == reviews[j])
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(reviews[i], reviews[j]);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
+
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
+                            results.Add(new Result { Left = reviews[i], Right = reviews[j], Score = similarityScore });
+                    }
+                }
+
+                timer.Stop();
+
+                OutputResults(results, "GreedyRealWorld", counter, subCounter);
+                results.Clear();
+
+                Console.WriteLine("\nBucket-Set {0}-{1} Results:", counter, subCounter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                subCounter++;
+
+                // Increment To Next Bucket
+                counter++;
+            }
+
+            Console.WriteLine("\n-------------------------- END OF REAL-WORLD DATASET --------------------------\n");
+        }
 
         /** Helper Methods **/
 
         static public int DisplayMenu()
         {
-            Console.WriteLine("Fake Website Review Simulation");
-            Console.WriteLine();
-            Console.WriteLine("1. Generate/Regenerate Random Dataset");
+            
+            Console.WriteLine("\nFake Website Review Simulation");
 
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n1. Generate/Regenerate Random Dataset");
+            Console.ForegroundColor = ConsoleColor.White;
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("\n2. Dynamic Programming: Random-Same-Length Dataset");
             Console.WriteLine("3. Dynamic Programming: Random-Different-Length Dataset");
             Console.WriteLine("4. Dynamic Programming: Real-World Dataset");
+            Console.ForegroundColor = ConsoleColor.White;
 
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\n5. Greedy: Random-Same-Length Dataset");
             Console.WriteLine("6. Greedy: Random-Different-Length Dataset");
             Console.WriteLine("7. Greedy: Real-World Dataset");
+            Console.ForegroundColor = ConsoleColor.White;
 
+            Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine("\n8. Exit");
+            Console.ForegroundColor = ConsoleColor.White;
 
             var result = Console.ReadLine();
             return Convert.ToInt32(result);
