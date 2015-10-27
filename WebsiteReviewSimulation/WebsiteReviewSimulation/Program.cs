@@ -8,8 +8,9 @@ namespace WebsiteReviewSimulation
 {
     class Program
     {
+        public static readonly string resultPath = Environment.CurrentDirectory + "/Results/";
         public static readonly double SCORE_THRESHOLD = 0.7;
-        public static readonly int EXIT = 4;
+        public static readonly int EXIT = 8;
         public static readonly int[] STRING_LENGTH = { 10, 100, 150, 200, 250, 300, 350, 400, 450, 500 };
         public static readonly TupleList<int, int> RANGES = new TupleList<int,int>
         {
@@ -29,10 +30,10 @@ namespace WebsiteReviewSimulation
         {
             // Initial Directory Setup
             var appPath = Environment.CurrentDirectory;
-            var resultPath = Environment.CurrentDirectory + "/Results/";
             System.IO.Directory.CreateDirectory(appPath + "/Random/Same/");
             System.IO.Directory.CreateDirectory(appPath + "/Random/Different/");
             System.IO.Directory.CreateDirectory(appPath + "/Processed/");
+            System.IO.Directory.CreateDirectory(resultPath);
 
             int userInput = 0;
 
@@ -51,16 +52,19 @@ namespace WebsiteReviewSimulation
                         File.Delete(appPath + "/Processed/" + "MASTER" + ".txt");
                         break;
                     }
-                    case 2: // Run Dynamice Programming Simulation
+                    case 2:
                     {
-                        RunDynamicSimulationRandomSet();
-                        Console.ReadLine();
-                        RunDynamicSimulation();
+                        RunDymanicSimulationRandomSetSameLength();
                         break;
                     }
-                    case 3: // Runn Greedy Simulation
+                    case 3: 
                     {
-                        RunGreedySimulation();
+                        RunDynamicSimulationRandomSetDifferentLengths();
+                        break;
+                    }
+                    case 4:
+                    {
+                        RunDynamicSimulation();
                         break;
                     }
                 }
@@ -167,7 +171,7 @@ namespace WebsiteReviewSimulation
 
         /** Module 3A: Run Dynamic Programming Simulation **/
 
-        public static void RunDynamicSimulationRandomSet()
+        public static void RunDymanicSimulationRandomSetSameLength()
         {
             var appPathSame = Environment.CurrentDirectory + "/Random/Same/";
             var appPathDifferent = Environment.CurrentDirectory + "/Random/Different/";
@@ -181,17 +185,22 @@ namespace WebsiteReviewSimulation
                 // List Of Reviews In File
                 var reviews = new List<string>();
                 var results = new List<Result>();
-                var review = File.ReadAllLines(file).ToString().Trim();
+                var rawReviews = File.ReadAllLines(file);
+                double scoreTotal = 0;
+                double avgCounter = 0;
 
-                reviews.Add(review);
+                foreach (var review in rawReviews)
+                    reviews.Add(review);
 
-                System.Console.WriteLine("\nComputing Results For Random Dataset Of Length: {0} ", STRING_LENGTH[counter]);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\nComputing Results For Random Dataset Of Length: {0} ", STRING_LENGTH[counter]);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                var timer = new Stopwatch();
+                timer.Start();
 
                 foreach (var X in reviews)
                 {
-                    var timer = new Stopwatch();
-                    timer.Start();
-
                     foreach (var Y in reviews)
                     {
                         if (X == Y)
@@ -199,23 +208,37 @@ namespace WebsiteReviewSimulation
 
                         var lcsLength = CountLCSDynamic(X.ToCharArray(), Y.ToCharArray());
                         var similarityScore = Convert.ToDouble(lcsLength) / Y.Length;
+                        scoreTotal += similarityScore;
+                        avgCounter++;
 
-                        if (similarityScore > SCORE_THRESHOLD)
-                            results.Add(new Result { Score = similarityScore, Time = 0 });
-                    }
-
-                    timer.Stop();
-                    OutputResults(counter, results, timer.ElapsedTicks);
-                    timer.Reset();
-                    results.Clear();
+                        if (similarityScore > SCORE_THRESHOLD && X != Y)
+                            results.Add(new Result { Left = X, Right = Y, Score = similarityScore });        
+                    }              
                 }
 
-                System.Console.WriteLine("Calculations Complete For Random Dataset Of Length: {0} \nSaving Results...", STRING_LENGTH[counter]);
+                timer.Stop();
+
+                OutputResults(results, "DynamicRandomSameLength", counter);
+
+                Console.WriteLine("\nBucket-Set {0} Results:", counter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+                
+                timer.Reset();
+                results.Clear();
                 counter++;
             }
 
-            // Reset Counter
-            counter = 0;
+            Console.WriteLine("\n---------------------------- END OF RANDOM DATASET ----------------------------\n");
+        }
+
+        public static void RunDynamicSimulationRandomSetDifferentLengths()
+        {
+            var appPathSame = Environment.CurrentDirectory + "/Random/Same/";
+            var appPathDifferent = Environment.CurrentDirectory + "/Random/Different/";
+            var appPathProcessed = Environment.CurrentDirectory + "/Processed/";
+
+            var counter = 0;
 
             // Random Dataset-Different
             foreach (var file in Directory.EnumerateFiles(appPathDifferent, "*.txt"))
@@ -223,17 +246,22 @@ namespace WebsiteReviewSimulation
                 // List Of Reviews In File
                 var reviews = new List<string>();
                 var results = new List<Result>();
-                var review = File.ReadAllLines(file).ToString().Trim();
+                var rawReviews = File.ReadAllLines(file);
+                double scoreTotal = 0;
+                double avgCounter = 0;
 
-                reviews.Add(review);
+                foreach (var review in rawReviews)
+                    reviews.Add(review);
 
-                System.Console.WriteLine("\nComputing Results For Random Dataset Of In The Range: {0} - {1} ", RANGES[counter].Item1, RANGES[counter].Item2);
+                Console.ForegroundColor = ConsoleColor.Green;
+                System.Console.WriteLine("\nComputing Results For Random Dataset In The Range: {0} - {1} ", RANGES[counter].Item1, RANGES[counter].Item2);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                var timer = new Stopwatch();
+                timer.Start();
 
                 foreach (var X in reviews)
-                {
-                    var timer = new Stopwatch();
-                    timer.Start();
-
+                {                  
                     foreach (var Y in reviews)
                     {
                         if (X == Y)
@@ -241,18 +269,24 @@ namespace WebsiteReviewSimulation
 
                         var lcsLength = CountLCSDynamic(X.ToCharArray(), Y.ToCharArray());
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(X.Length, Y.Length);
+                        scoreTotal += similarityScore;
+                        avgCounter++;
 
-                        if (similarityScore > SCORE_THRESHOLD)
-                            results.Add(new Result { Score = similarityScore, Time = 0 });
+                        if (similarityScore > SCORE_THRESHOLD && X != Y)
+                            results.Add(new Result { Left = X, Right = Y, Score = similarityScore });
                     }
-
-                    timer.Stop();
-                    OutputResults(counter, results, timer.ElapsedTicks);
-                    timer.Reset();
-                    results.Clear();
                 }
 
-                System.Console.WriteLine("\nCalculations Complete For Random Dataset Of In The Range: {0} - {1} ", RANGES[counter].Item1, RANGES[counter].Item2);
+                timer.Stop();
+
+                OutputResults(results, "DynamicRandomDifferentLengths",  counter);
+
+                Console.WriteLine("\nBucket-Set {0} Results:", counter);
+                Console.WriteLine("Execution Time: {0} ms", timer.ElapsedMilliseconds);
+                Console.WriteLine("Average Similarity Score: {0}", scoreTotal / avgCounter);
+
+                timer.Reset();
+                results.Clear();
                 counter++;
             }
 
@@ -282,6 +316,7 @@ namespace WebsiteReviewSimulation
                 // Pre-Process Data Split By Pipe
                 var rawFile = new StreamReader(file);
                 var data = rawFile.ReadToEnd();
+                rawFile.Close();
 
                 string[] parsedReviews = data.Split('|');
                 for (int i = 0; i < parsedReviews.Length; i++)
@@ -307,24 +342,116 @@ namespace WebsiteReviewSimulation
                         var lcsLength = CountLCSDynamic(reviews[i].ToCharArray(), reviews[j].ToCharArray());
                         var similarityScore = Convert.ToDouble(lcsLength) / Min(reviews[i].Length, reviews[j].Length);
 
-                        if (similarityScore > SCORE_THRESHOLD)
+                        if (similarityScore > SCORE_THRESHOLD && reviews[i] != reviews[j])
                             results.Add(new Result { Score = similarityScore, Time = 0 });                  
                     }
 
                     timer.Stop();
-                    OutputResults(counter, results, timer.ElapsedTicks);
+                    OutputResults(results, "DynamicRealWorld", counter);
                     timer.Reset();
                 }
-
-                rawFile.Close();
-                
-                
+          
                 System.Console.WriteLine("\nCalculations Complete For Real World Dataset Bucket: {0}", counter);
                 counter++;
             }
+
+            Console.WriteLine("\n-------------------------- END OF REAL-WORLD DATASET --------------------------\n");
         }
 
         /** Module 3B: Run Greedy Simulation **/
+
+        public static void RunGreedySimulationRandomSet()
+        {
+            var appPathSame = Environment.CurrentDirectory + "/Random/Same/";
+            var appPathDifferent = Environment.CurrentDirectory + "/Random/Different/";
+            var appPathProcessed = Environment.CurrentDirectory + "/Processed/";
+
+            var counter = 0;
+
+            // Random Dataset-Same
+            foreach (var file in Directory.EnumerateFiles(appPathSame, "*.txt"))
+            {
+                // List Of Reviews In File
+                var reviews = new List<string>();
+                var results = new List<Result>();
+                var rawReviews = File.ReadAllLines(file);
+
+                foreach (var review in rawReviews)
+                    reviews.Add(review);
+
+                System.Console.WriteLine("\nComputing Results For Random Dataset Of Length: {0} ", STRING_LENGTH[counter]);
+
+                foreach (var X in reviews)
+                {
+                    var timer = new Stopwatch();
+                    timer.Start();
+
+                    foreach (var Y in reviews)
+                    {
+                        if (X == Y)
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(X, Y);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Y.Length;
+
+                        if (similarityScore > SCORE_THRESHOLD)
+                            results.Add(new Result { Score = similarityScore, Time = 0 });
+                    }
+
+                    timer.Stop();
+                    OutputResults(results, "GreedyTODO", counter);
+                    timer.Reset();
+                    results.Clear();
+                }
+
+                System.Console.WriteLine("Calculations Complete For Random Dataset Of Length: {0}", STRING_LENGTH[counter]);
+                counter++;
+            }
+
+            // Reset Counter
+            counter = 0;
+
+            // Random Dataset-Different
+            foreach (var file in Directory.EnumerateFiles(appPathDifferent, "*.txt"))
+            {
+                // List Of Reviews In File
+                var reviews = new List<string>();
+                var results = new List<Result>();
+                var review = File.ReadAllLines(file).ToString().Trim();
+
+                reviews.Add(review);
+
+                System.Console.WriteLine("\nComputing Results For Random Dataset In The Range: {0} - {1} ", RANGES[counter].Item1, RANGES[counter].Item2);
+
+                foreach (var X in reviews)
+                {
+                    var timer = new Stopwatch();
+                    timer.Start();
+
+                    foreach (var Y in reviews)
+                    {
+                        if (X == Y)
+                            continue;
+
+                        var lcsLength = CountLCSGreedy(X, Y);
+                        var similarityScore = Convert.ToDouble(lcsLength) / Min(X.Length, Y.Length);
+
+                        if (similarityScore > SCORE_THRESHOLD)
+                            results.Add(new Result { Score = similarityScore, Time = 0 });
+                    }
+
+                    timer.Stop();
+                    OutputResults(results, "GreedyTODO", counter);
+                    timer.Reset();
+                    results.Clear();
+                }
+       
+                System.Console.WriteLine("\nCalculations Complete For Random Dataset In The Range: {0} - {1} ", RANGES[counter].Item1, RANGES[counter].Item2);
+                counter++;
+            }
+
+            Console.WriteLine("\n---------------------------- END OF RANDOM DATASET ----------------------------\n");
+        }
 
         public static void RunGreedySimulation()
         {
@@ -338,80 +465,6 @@ namespace WebsiteReviewSimulation
             var appPathProcessed = Environment.CurrentDirectory + "/Processed/";
 
             var counter = 0;
-
-            // Random Dataset-Same
-            foreach (var file in Directory.EnumerateFiles(appPathSame, "*.txt"))
-            {
-                // List Of Reviews In File
-                var reviews = new List<string>();
-                var results = new Dictionary<Tuple<string, string>, double>();
-                var review = File.ReadAllLines(file).ToString().Trim();
-
-                reviews.Add(review);
-
-                System.Console.WriteLine("\nComputing Results For Random Dataset Of Length: {0} ", STRING_LENGTH[counter]);
-
-                foreach (var X in reviews)
-                {
-                    foreach (var Y in reviews)
-                    {
-                        if (X == Y)
-                            continue;
-
-                        var lcsLength = CountLCSGreedy(X, Y);
-                        var similarityScore = Convert.ToDouble(lcsLength) / Y.Length;
-
-                        if (similarityScore > SCORE_THRESHOLD)
-                            results.Add(new Tuple<string, string>(X, Y), similarityScore);
-                    }
-                }
-
-                // TODO
-                // Save & Output Results
-                System.Console.WriteLine("Calculations Complete For Random Dataset Of Length: {0} \nSaving Results...", STRING_LENGTH[counter]);
-
-                counter++;
-            }
-
-            // Reset Counter
-            counter = 0;
-
-            // Random Dataset-Different
-            foreach (var file in Directory.EnumerateFiles(appPathDifferent, "*.txt"))
-            {
-                // List Of Reviews In File
-                var reviews = new List<string>();
-                var results = new Dictionary<Tuple<string, string>, double>();
-                var review = File.ReadAllLines(file).ToString().Trim();
-
-                reviews.Add(review);
-
-                System.Console.WriteLine("\nComputing Results For Random Dataset Of In The Range: {0} - {1} ", RANGES[counter].Item1, RANGES[counter].Item2);
-
-                foreach (var X in reviews)
-                {
-                    foreach (var Y in reviews)
-                    {
-                        if (X == Y)
-                            continue;
-
-                        var lcsLength = CountLCSGreedy(X, Y);
-                        var similarityScore = Convert.ToDouble(lcsLength) / Min(X.Length, Y.Length);
-
-                        if (similarityScore > SCORE_THRESHOLD)
-                            results.Add(new Tuple<string, string>(X, Y), similarityScore);
-                    }
-                }
-
-                // TODO
-                // Save & Output Results
-                System.Console.WriteLine("\nCalculations Complete For Random Dataset Of In The Range: {0} - {1} ", RANGES[counter].Item1, RANGES[counter].Item2);
-
-                counter++;
-            }
-
-            // Reset Counter
-            counter = 0;
 
             // Real World Dataset
             foreach (var file in Directory.EnumerateFiles(appPathProcessed, "*.txt"))
@@ -464,9 +517,16 @@ namespace WebsiteReviewSimulation
             Console.WriteLine("Fake Website Review Simulation");
             Console.WriteLine();
             Console.WriteLine("1. Generate/Regenerate Random Dataset");
-            Console.WriteLine("2. Run Simulation With Dynamic Programming Algorithm");
-            Console.WriteLine("3. Run Simulation With Greedy Algorithm");
-            Console.WriteLine("4. Exit");
+
+            Console.WriteLine("\n2. Dynamic Programming: Random-Same-Length Dataset");
+            Console.WriteLine("3. Dynamic Programming: Random-Different-Length Dataset");
+            Console.WriteLine("4. Dynamic Programming: Real-World Dataset");
+
+            Console.WriteLine("\n5. Greedy: Random-Same-Length Dataset");
+            Console.WriteLine("6. Greedy: Random-Different-Length Dataset");
+            Console.WriteLine("7. Greedy: Real-World Dataset");
+
+            Console.WriteLine("\n8. Exit");
 
             var result = Console.ReadLine();
             return Convert.ToInt32(result);
@@ -512,7 +572,6 @@ namespace WebsiteReviewSimulation
 
         public static int CountLCSGreedy(string X, string Y)
         {
-
             X = Match(X, Y);
 
             int[] Processed_Y = new int[Y.Length];
@@ -614,23 +673,21 @@ namespace WebsiteReviewSimulation
                 }
             }
 
-            // TODO: Remove For Final Version
-            Console.WriteLine(LSym);
             return LSym.Length / 2;
         }
 
-        public static void OutputResults(int bucket, List<Result> results, long time)
+        public static void OutputResults(List<Result> results, string fileName, int counter)
         {
-            Console.WriteLine("\nBucket {0} Results", bucket);
-            Console.WriteLine("\tExecution Time: {0}", time);
+            var path = resultPath + fileName + "[" + counter + "]" + ".txt";
+            var newResults = new List<string>();
 
             foreach (var result in results)
             {
-                Console.WriteLine("Similarity Score: " + result.Score);
+                var newResult = "[" + result.Score + "] " + result.Left + " <---> " + result.Right;
+                newResults.Add(newResult);
+            }
 
-                if (result.Time > 0)
-                    Console.WriteLine("Execution Time: " + result.Time);
-            }               
+            File.WriteAllLines(path, newResults);
         }
 
         /** Dynamic Programming Helper Methods **/
@@ -705,6 +762,8 @@ namespace WebsiteReviewSimulation
 
     public class Result
     {
+        public string Left { get; set; }
+        public string Right { get; set; }
         public double Score { get; set; }
         public long Time { get; set; }
     }
